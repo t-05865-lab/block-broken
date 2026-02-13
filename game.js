@@ -69,7 +69,12 @@ function collisionDetection(){
                     score++;
                     if(score === brickRowCount * brickColumnCount && !isGameCleared){
                         isGameCleared = true; // クリアフラグON
-                        drawClear();
+                          drawClear(); // クリア画面描画
+                        // draw ループを止め、2秒後にリセットして再開
+                        setTimeout(() => {
+                            resetGame();
+                            draw();
+                        }, 2000);
                         setTimeout(resetGame, 2000); // 2秒後にリセット
                     }
                 }
