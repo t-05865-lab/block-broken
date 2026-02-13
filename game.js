@@ -26,7 +26,10 @@ let bricks = [];
 // スコア
 let score = 0;
 
-// 初期化関数（リセット用）
+// クリアフラグ
+let isGameCleared = false;
+
+// 初期化関数
 function initBricks() {
     bricks = [];
     for(let c=0; c<brickColumnCount; c++){
@@ -36,6 +39,7 @@ function initBricks() {
         }
     }
     score = 0;
+    isGameCleared = false;
 }
 
 // 初期化
@@ -63,8 +67,8 @@ function collisionDetection(){
                     dy = -dy;
                     b.status = 0;
                     score++;
-                    if(score === brickRowCount * brickColumnCount){
-                        // クリア
+                    if(score === brickRowCount * brickColumnCount && !isGameCleared){
+                        isGameCleared = true; // クリアフラグON
                         drawClear();
                         setTimeout(resetGame, 2000); // 2秒後にリセット
                     }
@@ -107,51 +111,4 @@ function drawBricks(){
                 let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
                 let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
                 bricks[c][r].x = brickX;
-                bricks[c][r].y = brickY;
-                ctx.beginPath();
-                ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = "#f00";
-                ctx.fill();
-                ctx.closePath();
-            }
-        }
-    }
-}
-
-// ゲームリセット
-function resetGame(){
-    x = canvas.width/2;
-    y = canvas.height-30;
-    dx = 2;
-    dy = -2;
-    paddleX = (canvas.width - paddleWidth)/2;
-    initBricks();
-    draw();
-}
-
-// メイン描画
-function draw(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBricks();
-    drawBall();
-    drawPaddle();
-    collisionDetection();
-
-    // 壁反射
-    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) dx = -dx;
-    if(y + dy < ballRadius) dy = -dy;
-    else if(y + dy > canvas.height-ballRadius){
-        if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
-        else alert("ゲームオーバー"), resetGame();
-    }
-
-    // パドル移動
-    if(rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 5;
-    if(leftPressed && paddleX > 0) paddleX -= 5;
-
-    x += dx;
-    y += dy;
-    requestAnimationFrame(draw);
-}
-
-draw();
+                b
