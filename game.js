@@ -26,33 +26,7 @@ let bricks = [];
 // ゲーム状態
 let score = 0;
 let level = 1;
-let isGameOver = false;
-let isGameCleared = false;
-
-// 初期化関数
-function initBricks() {
-    bricks = [];
-    for(let c=0; c<brickColumnCount; c++){
-        bricks[c] = [];
-        for(let r=0; r<brickRowCount; r++){
-            bricks[c][r] = { x:0, y:0, status:1 };
-        }
-    }
-}
-
-// ゲーム初期化
-function resetGame() {
-    x = canvas.width/2;
-    y = canvas.height-30;
-    dx = 2 + (level-1)*0.5; // レベルで速度アップ
-    dy = -2 - (level-1)*0.5;
-    paddleX = (canvas.width - paddleWidth)/2;
-    score = 0;
-    isGameOver = false;
-    isGameCleared = false;
-    initBricks();
-    draw();
-}
+let gameState = "title"; // title, playing, cleared, gameover
 
 // キー操作
 let rightPressed = false;
@@ -66,6 +40,36 @@ document.addEventListener("keyup", e => {
   if(e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
 });
 
+// クリックでゲーム開始
+canvas.addEventListener("click", () => {
+    if(gameState === "title"){
+        gameState = "playing";
+        resetGame();
+    }
+});
+
+// ブロック初期化
+function initBricks() {
+    bricks = [];
+    for(let c=0; c<brickColumnCount; c++){
+        bricks[c] = [];
+        for(let r=0; r<brickRowCount; r++){
+            bricks[c][r] = { x:0, y:0, status:1 };
+        }
+    }
+}
+
+// ゲームリセット
+function resetGame(){
+    x = canvas.width/2;
+    y = canvas.height-30;
+    dx = 2 + (level-1)*0.5; // レベルで速度アップ
+    dy = -2 - (level-1)*0.5;
+    paddleX = (canvas.width - paddleWidth)/2;
+    score = 0;
+    initBricks();
+}
+
 // 衝突判定
 function collisionDetection(){
     for(let c=0;c<brickColumnCount;c++){
@@ -77,10 +81,11 @@ function collisionDetection(){
                     b.status = 0;
                     score++;
                     if(score === brickRowCount*brickColumnCount){
-                        isGameCleared = true;
+                        gameState = "cleared";
                         drawClear();
                         setTimeout(() => {
                             level++;
+                            gameState = "playing";
                             resetGame();
                         }, 2000);
                     }
@@ -90,7 +95,7 @@ function collisionDetection(){
     }
 }
 
-// 画面描画関数
+// 描画関数
 function drawBricks(){
     for(let c=0;c<brickColumnCount;c++){
         for(let r=0;r<brickRowCount;r++){
@@ -132,6 +137,17 @@ function drawScore(){
     ctx.fillText("レベル: "+level, canvas.width-80, 20);
 }
 
+// タイトル画面
+function drawTitle(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "#0ff";
+    ctx.textAlign = "center";
+    ctx.fillText("ブロック崩しゲーム", canvas.width/2, canvas.height/2 - 20);
+    ctx.font = "20px Arial";
+    ctx.fillText("クリックでスタート", canvas.width/2, canvas.height/2 + 20);
+}
+
 // クリア画面
 function drawClear(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -152,7 +168,12 @@ function drawGameOver(){
 
 // メイン描画
 function draw(){
-    if(isGameOver || isGameCleared) return; // 停止
+    if(gameState === "title"){
+        drawTitle();
+        requestAnimationFrame(draw);
+        return;
+    }
+    if(gameState === "cleared" || gameState === "gameover") return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
@@ -167,9 +188,12 @@ function draw(){
     else if(y + dy > canvas.height-ballRadius){
         if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
         else {
-            isGameOver = true;
+            gameState = "gameover";
             drawGameOver();
-            setTimeout(resetGame, 2000);
+            setTimeout(() => {
+                gameState = "title";
+                draw();
+            }, 2000);
         }
     }
 
@@ -183,5 +207,5 @@ function draw(){
     requestAnimationFrame(draw);
 }
 
-// ゲームスタート
-resetGame();
+// ゲーム開始
+draw();
