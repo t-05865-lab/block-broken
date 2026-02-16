@@ -1,16 +1,16 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// パドル
+// --- パドル ---
 const paddleHeight = 10;
 const paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth) / 2;
 
-// ボール
+// --- ボール ---
 let balls = [];
 const ballRadius = 10;
 
-// ブロック
+// --- ブロック ---
 let brickRowCount = 3;
 let brickColumnCount = 5;
 const brickWidth = 75;
@@ -20,16 +20,15 @@ const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 let bricks = [];
 
-// ゲーム状態
+// --- ゲーム状態 ---
 let score = 0;
 let level = 1;
 let gameState = "title"; // title, playing, cleared, gameover
 
-// キー操作
+// --- キー操作 ---
 let rightPressed = false;
 let leftPressed = false;
 
-// キーイベント
 document.addEventListener("keydown", e => {
   if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
   if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
@@ -40,7 +39,7 @@ document.addEventListener("keyup", e => {
   if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
 });
 
-// クリックでゲーム開始
+// --- クリックでゲーム開始 ---
 canvas.addEventListener("click", () => {
   if (gameState === "title") {
     gameState = "playing";
@@ -48,7 +47,7 @@ canvas.addEventListener("click", () => {
   }
 });
 
-// ブロック初期化
+// --- ブロック初期化 ---
 function initBricks() {
   bricks = [];
   for (let c = 0; c < brickColumnCount; c++) {
@@ -64,10 +63,9 @@ function initBricks() {
   }
 }
 
-// ゲームリセット
+// --- ゲームリセット ---
 function resetGame() {
-  // レベルに応じた行数を更新
-  brickRowCount = 3 + (level - 1);
+  brickRowCount = 3 + (level - 1); // レベルに応じて行数増加
 
   balls = [
     {
@@ -81,11 +79,10 @@ function resetGame() {
   paddleX = (canvas.width - paddleWidth) / 2;
   score = 0;
 
-  // ブロックを初期化
   initBricks();
 }
 
-// 衝突判定
+// --- 衝突判定 ---
 function collisionDetection() {
   if (!bricks.length || !balls.length) return;
 
@@ -96,17 +93,15 @@ function collisionDetection() {
         const b = bricks[c][r];
         if (!b) continue;
 
-        if (b.status === 1) {
-          if (
+        if (b.status === 1 &&
             ball.x > b.x &&
             ball.x < b.x + brickWidth &&
             ball.y > b.y &&
             ball.y < b.y + brickHeight
-          ) {
-            ball.dy = -ball.dy;
-            b.status = 0;
-            score++;
-          }
+        ) {
+          ball.dy = -ball.dy;
+          b.status = 0;
+          score++;
         }
       }
     }
@@ -117,8 +112,7 @@ function collisionDetection() {
   for (let c = 0; c < bricks.length; c++) {
     if (!bricks[c]) continue;
     for (let r = 0; r < bricks[c].length; r++) {
-      if (!bricks[c][r]) continue;
-      if (bricks[c][r].status === 1) remaining++;
+      if (bricks[c][r] && bricks[c][r].status === 1) remaining++;
     }
   }
 
@@ -132,7 +126,7 @@ function collisionDetection() {
   }
 }
 
-// --- 描画関数 ---
+// --- 描画 ---
 function drawBricks() {
   for (let c = 0; c < bricks.length; c++) {
     if (!bricks[c]) continue;
@@ -269,7 +263,7 @@ function draw() {
     ball.y += ball.dy;
   }
 
-  // ボール全滅
+  // ボール全滅でゲームオーバー
   if (balls.length === 0) gameState = "gameover";
 
   // パドル操作
@@ -279,5 +273,5 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// ゲーム開始
+// --- ゲーム開始 ---
 draw();
