@@ -41,12 +41,17 @@ document.addEventListener("keyup", e => {
 
 // --- クリックでゲーム開始 ---
 canvas.addEventListener("click", () => {
-  if (gameState === "title"|| gameState === "gameover") {
+  if (gameState === "title") {
     level = 1;
     gameState = "playing";
     resetGame();
     draw();
   }
+  else if (gameState === "gameover"){
+    gameState = "title";
+    draw();
+    }
+    
 });
 
 // --- ブロック初期化 ---
