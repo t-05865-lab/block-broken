@@ -111,6 +111,29 @@ function collisionDetection(){
 
     });
 }
+let remaining = 0;
+{
+    gameState = "cleared";
+    setTimeout(()=>{
+        level++;
+        gameState = "playing";
+        resetGame();
+    }, 2000);
+}
+
+for(let c=0; c<brickColumnCount; c++){
+    for(let r=0; r<brickRowCount; r++){
+        if(bricks[c][r].status === 1){
+            remaining++;
+        }
+    }
+}
+
+if(remaining === 0){
+    level++;
+    gameState = "cleared";
+}
+
 
 // 描画関数
 function drawBricks(){
@@ -212,8 +235,16 @@ function draw(){
         requestAnimationFrame(draw);
         return;
     }
-    if(gameState === "cleared" || gameState === "gameover") return;
+     if(gameState === "gameover"){
+        drawGameOver();
+        return;
+    }
 
+    if(gameState === "cleared"){
+        drawClear();
+        return;
+    }
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
     drawBalls();
