@@ -66,6 +66,9 @@ function initBricks() {
 
 // ゲームリセット
 function resetGame() {
+  // レベルに応じた行数を更新
+  brickRowCount = 3 + (level - 1);
+
   balls = [
     {
       x: canvas.width / 2,
@@ -76,21 +79,22 @@ function resetGame() {
   ];
 
   paddleX = (canvas.width - paddleWidth) / 2;
-  brickRowCount = 3 + level - 1;
   score = 0;
+
+  // ブロックを初期化
   initBricks();
 }
 
 // 衝突判定
 function collisionDetection() {
-  if (!bricks || bricks.length === 0 || !balls || balls.length === 0) return;
+  if (!bricks.length || !balls.length) return;
 
   balls.forEach(ball => {
-    for (let c = 0; c < brickColumnCount; c++) {
+    for (let c = 0; c < bricks.length; c++) {
       if (!bricks[c]) continue;
-      for (let r = 0; r < brickRowCount; r++) {
-        let b = bricks[c][r];
-        if (!b) continue;  // <- undefined 対策
+      for (let r = 0; r < bricks[c].length; r++) {
+        const b = bricks[c][r];
+        if (!b) continue;
 
         if (b.status === 1) {
           if (
@@ -108,31 +112,11 @@ function collisionDetection() {
     }
   });
 
-  // 残りブロックチェック
-  let remaining = 0;
-  for (let c = 0; c < brickColumnCount; c++) {
-    if (!bricks[c]) continue;
-    for (let r = 0; r < brickRowCount; r++) {
-      if (!bricks[c][r]) continue;
-      if (bricks[c][r].status === 1) remaining++;
-    }
-  }
-
-  if (remaining === 0 && gameState === "playing") {
-    gameState = "cleared";
-    setTimeout(() => {
-      level++;
-      resetGame();
-      gameState = "playing";
-    }, 1500);
-  }
-}
-
   // 残ブロックチェック
   let remaining = 0;
-  for (let c = 0; c < brickColumnCount; c++) {
+  for (let c = 0; c < bricks.length; c++) {
     if (!bricks[c]) continue;
-    for (let r = 0; r < brickRowCount; r++) {
+    for (let r = 0; r < bricks[c].length; r++) {
       if (!bricks[c][r]) continue;
       if (bricks[c][r].status === 1) remaining++;
     }
@@ -142,24 +126,23 @@ function collisionDetection() {
     gameState = "cleared";
     setTimeout(() => {
       level++;
-      gameState = "playing";
       resetGame();
+      gameState = "playing";
     }, 1500);
   }
 }
 
-// 描画関数
+// --- 描画関数 ---
 function drawBricks() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
-      let b = bricks[c][r];
+  for (let c = 0; c < bricks.length; c++) {
+    if (!bricks[c]) continue;
+    for (let r = 0; r < bricks[c].length; r++) {
+      const b = bricks[c][r];
       if (b && b.status === 1) {
-        let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-        let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-        b.x = brickX;
-        b.y = brickY;
+        b.x = c * (brickWidth + brickPadding) + brickOffsetLeft;
+        b.y = r * (brickHeight + brickPadding) + brickOffsetTop;
         ctx.beginPath();
-        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.rect(b.x, b.y, brickWidth, brickHeight);
         ctx.fillStyle = b.color;
         ctx.fill();
         ctx.closePath();
@@ -193,7 +176,6 @@ function drawScore() {
   ctx.fillText("レベル: " + level, canvas.width - 80, 20);
 }
 
-// 画面表示
 function drawTitle() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = "30px Arial";
@@ -220,23 +202,22 @@ function drawGameOver() {
   ctx.fillText("ゲームオーバー！", canvas.width / 2, canvas.height / 2);
 }
 
-// マルチボール
+// --- マルチボール ---
 function addMultiBall() {
   if (balls.length >= 10) return;
-  let newBalls = [];
-  balls.forEach(ball => {
-    newBalls.push({
-      x: ball.x,
-      y: ball.y,
-      dx: -ball.dx,
-      dy: ball.dy
-    });
-  });
+  const newBalls = balls.map(ball => ({
+    x: ball.x,
+    y: ball.y,
+    dx: -ball.dx,
+    dy: ball.dy
+  }));
   balls.push(...newBalls);
 }
 
-// メイン描画ループ
+// --- メイン描画ループ ---
 function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   if (gameState === "title") {
     drawTitle();
     requestAnimationFrame(draw);
@@ -254,15 +235,13 @@ function draw() {
     return;
   }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   drawBricks();
   drawBalls();
   drawPaddle();
   drawScore();
   collisionDetection();
 
-  // ボール移動と壁・パドル判定
+  // ボール移動
   for (let i = balls.length - 1; i >= 0; i--) {
     let ball = balls[i];
 
@@ -290,10 +269,8 @@ function draw() {
     ball.y += ball.dy;
   }
 
-  // ボールが全滅したらゲームオーバー
-  if (balls.length === 0) {
-    gameState = "gameover";
-  }
+  // ボール全滅
+  if (balls.length === 0) gameState = "gameover";
 
   // パドル操作
   if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 5;
