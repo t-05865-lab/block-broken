@@ -7,7 +7,7 @@ const paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth)/2;
 
 // ボール
-let ball = [];
+let balls = [];
 balls.push({
     x: canvas.width/2,
     y: canvas.height-30,
@@ -293,4 +293,4 @@ if(balls.length === 0){
 
 // ゲーム開始
 draw();
-}
+
