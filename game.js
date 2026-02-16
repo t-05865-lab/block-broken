@@ -87,30 +87,46 @@ function resetGame(){
 
 // 衝突判定
 function collisionDetection(){
-    for(let c=0;c<brickColumnCount;c++){
-        for(let r=0;r<brickRowCount;r++){
+    for(let c=0; c<brickColumnCount; c++){
+        for(let r=0; r<brickRowCount; r++){
             let b = bricks[c][r];
             if(b.status === 1){
-                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
-                    dy = -dy;
-                    b.status = 0;
-                    score++;
-                    if(score === brickRowCount*brickColumnCount){
-                        gameState = "cleared";
-                        drawClear();
-                        setTimeout(() => {
-                            level++;
-                            gameState = "playing";
-                            resetGame();
-                            draw();
-                        }, 2000);
+                for(let ball of balls) {
+                    if(ball.x > b.x && ball.x < b.x+brickWidth && ball.y > b.y && ball.y < b.y+brickHeight){
+                        ball.dy = -ball.dy;
+                        b.status = 0;
+                        score++;
+                        if(score === brickRowCount*brickColumnCount * level){ // 簡易的なクリア判定計算
+                            // 全ブロック破壊時の処理（スコア計算は本来もっと厳密に管理すべきですが簡易化）
+                            // 実際は生きているブロック数をカウントする方が安全です
+                        }
                     }
                 }
             }
         }
     }
+    
+    // ブロックがすべて消えているか確認するロジックに変更
+    let activeBricks = 0;
+    for(let c=0; c<brickColumnCount; c++){
+        for(let r=0; r<brickRowCount; r++){
+            if(bricks[c][r].status === 1) activeBricks++;
+        }
+    }
+    
+    if(activeBricks === 0 && gameState === "playing"){
+        gameState = "cleared";
+        drawClear();
+        setTimeout(() => {
+            level++;
+            gameState = "playing";
+            resetGame();
+            // draw()はsetTimeout外でrequestAnimationFrameが止まっているので、ここで再開等の制御が必要ないよう設計
+            // ただしgameState制御で止めているので、drawを一度呼ぶ
+            draw(); 
+        }, 2000);
+    }
 }
-
 // 描画関数
 function drawBricks(){
     for(let c=0;c<brickColumnCount;c++){
