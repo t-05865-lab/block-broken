@@ -212,7 +212,7 @@ else if(y + dy > canvas.height - ballRadius){
         }, 2000);
         return;
     }
-}
+
 
     // パドル操作
     if(rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 5;
