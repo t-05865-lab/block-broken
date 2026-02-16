@@ -14,8 +14,8 @@ let dy = -2;
 const ballRadius = 10;
 
 // ブロック
-const brickRowCount = 3;
-const brickColumnCount = 5;
+let brickRowCount = 3 + level -1;
+let brickColumnCount = 5;
 const brickWidth = 75;
 const brickHeight = 20;
 const brickPadding = 10;
@@ -77,6 +77,8 @@ function collisionDetection(){
             let b = bricks[c][r];
             if(b.status === 1){
                 if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
+                    let hitPoint = x - (paddleX + paddleWidth/2);
+                    dx = hitPoint * 0.1;
                     dy = -dy;
                     b.status = 0;
                     score++;
