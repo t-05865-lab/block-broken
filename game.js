@@ -7,10 +7,14 @@ const paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth)/2;
 
 // ボール
-let x = canvas.width/2;
-let y = canvas.height-30;
-let dx = 2;
-let dy = -2;
+let ball = [];
+balls.push({
+    x: canvas.width/2,
+    y: canvas.height-30,
+    dx: 2,
+    dy: -2
+});
+
 const ballRadius = 10;
 
 // ブロック
@@ -34,6 +38,10 @@ let leftPressed = false;
 document.addEventListener("keydown", e => {
   if(e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
   if(e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
+  if(e.code === "Space"){
+    addMultiBall();
+}
+
 });
 document.addEventListener("keyup", e => {
   if(e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
@@ -116,12 +124,14 @@ function drawBricks(){
     }
 }
 
-function drawBall(){
-    ctx.beginPath();
-    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-    ctx.fillStyle = "#ff0";
-    ctx.fill();
-    ctx.closePath();
+function drawBalls(){
+    for(let ball of balls){
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 function drawPaddle(){
@@ -135,7 +145,7 @@ function drawPaddle(){
 function drawScore(){
     ctx.font = "16px Arial";
     ctx.fillStyle = "#fff";
-    ctx.fillText("スコア: "+score, 8, 20);
+    ctx.fillText("スコア: "+score, canvas.width80, 20);
     ctx.fillText("レベル: "+level, canvas.width-80, 20);
 }
 
@@ -159,6 +169,26 @@ function drawClear(){
     ctx.fillText("クリア！次のレベル", canvas.width/2, canvas.height/2);
 }
 
+//ボール増殖
+function addMultiBall(){
+
+    if(balls.length >= 10) return;
+
+    let newBalls = [];
+
+    for(let ball of balls){
+        newBalls.push({
+            x: ball.x,
+            y: ball.y,
+            dx: -ball.dx,
+            dy: ball.dy
+        });
+    }
+
+    balls.push(...newBalls);
+}
+
+
 // ゲームオーバー画面
 function drawGameOver(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -179,7 +209,7 @@ function draw(){
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
-    drawBall();
+    drawBalls();
     drawPaddle();
     drawScore();
     collisionDetection();
@@ -218,8 +248,40 @@ else if(y + dy > canvas.height - ballRadius){
     if(rightPressed && paddleX < canvas.width - paddleWidth) {paddleX += 5;}
     if(leftPressed && paddleX > 0) {paddleX -= 5;}
 
-    x += dx;
-    y += dy;
+  //ボールの移動判定
+  for(let ball of balls){
+
+    // 壁反射
+    if(ball.x + ball.dx > canvas.width - ballRadius || 
+       ball.x + ball.dx < ballRadius){
+        ball.dx = -ball.dx;
+    }
+
+    if(ball.y + ball.dy < ballRadius){
+        ball.dy = -ball.dy;
+    }
+    else if(ball.y + ball.dy > canvas.height - paddleHeight - ballRadius){
+
+        if(
+            ball.x + ballRadius > paddleX &&
+            ball.x - ballRadius < paddleX + paddleWidth
+        ){
+            ball.dy = -Math.abs(ball.dy);
+        }
+        else{
+            balls.splice(balls.indexOf(ball), 1);
+            continue;
+        }
+    }
+
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+}
+
+if(balls.length === 0){
+    gameState = "gameover";
+}
+
 
     requestAnimationFrame(draw);
 }
