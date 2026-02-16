@@ -108,7 +108,7 @@ function drawBricks(){
                 bricks[c][r].y = brickY;
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = "#f00";
+                ctx.fillStyle = `hsl(${Math.random()*360}, 70%, 50%)`;
                 ctx.fill();
                 ctx.closePath();
             }
