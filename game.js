@@ -1,6 +1,85 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function initAudio() {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playSound(type) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+    
+    if (type === "hit") { // ブロック・パドル衝突音
+        osc.type = "square";
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    } else if (type === "wall") { // 壁反射音
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+    } else if (type === "split") { // 分裂音
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+}
+
+// --- パーティクル（火花）システム ---
+let particles = [];
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        // ランダムな方向に飛び散る
+        this.dx = (Math.random() - 0.5) * 4;
+        this.dy = (Math.random() - 0.5) * 4;
+        this.alpha = 1; // 透明度
+        this.size = Math.random() * 3 + 2;
+    }
+    update() {
+        this.x += this.dx;
+        this.y += this.dy;
+        this.alpha -= 0.02; // 徐々に消える
+        this.size *= 0.95;  // 徐々に小さく
+    }
+    draw() {
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0; // 透明度リセット
+    }
+}
+
+function createParticles(x, y, color) {
+    for(let i=0; i<8; i++) { // 1回の衝突で8個飛ばす
+        particles.push(new Particle(x, y, color));
+    }
+}
+
 // --- パドル ---
 const paddleHeight = 10;
 const paddleWidth = 75;
