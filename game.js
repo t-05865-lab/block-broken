@@ -50,8 +50,7 @@ document.addEventListener("keyup", e => {
 
 // クリックでゲーム開始
 canvas.addEventListener("click", () => {
-    if(gameState === "title"|| gameState === "gameover"){
-        level = 1;
+    if(gameState === "title"){
         gameState = "playing";
         resetGame();
     }
