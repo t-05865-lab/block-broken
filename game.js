@@ -196,8 +196,8 @@ else if(y + dy > canvas.height - ballRadius){
 
     // パドルに当たっているか
     if(
-        x > paddleX &&
-        x < paddleX + paddleWidth
+       x + ballRadius > paddleX &&
+       x - ballRadius < paddleX + paddleWidth
     ){
         let hitPoint = x - (paddleX + paddleWidth/2);
         dx = hitPoint * 0.15;
