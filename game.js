@@ -197,9 +197,6 @@ function draw(){
         dy = -Math.abs(dy);
     }
 
-        let hitPoint = x - (paddleX + paddleWidth/2);
-        dx = hitPoint * 0.15;
-        dy = -Math.abs(dy);
     }
 
         else {
