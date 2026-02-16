@@ -14,7 +14,7 @@ let dy = -2;
 const ballRadius = 10;
 
 // ブロック
-let brickRowCount = 3 + level -1;
+let brickRowCount = 3 ;
 let brickColumnCount = 5;
 const brickWidth = 75;
 const brickHeight = 20;
@@ -67,17 +67,17 @@ function resetGame(){
     dy = -2 - (level-1)*0.5;
     paddleX = (canvas.width - paddleWidth)/2;
     score = 0;
+    brickRowCount = 3 + level - 1;
     initBricks();
 }
 
 // 衝突判定
-let hitPoint = x - (paddleX + paddleWidth/2);
 function collisionDetection(){
     for(let c=0;c<brickColumnCount;c++){
         for(let r=0;r<brickRowCount;r++){
             let b = bricks[c][r];
             if(b.status === 1){
-                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight)
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
                     dx = hitPoint * 0.1;
                     dy = -dy;
                     b.status = 0;
@@ -187,8 +187,13 @@ function draw(){
     // 壁反射
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) dx = -dx;
     if(y + dy < ballRadius) dy = -dy;
-    else if(y + dy > canvas.height-ballRadius){
-        if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
+   else if(y + dy > canvas.height-ballRadius){
+    if(x > paddleX && x < paddleX + paddleWidth){
+        let hitPoint = x - (paddleX + paddleWidth/2);
+        dx = hitPoint * 0.15;
+        dy = -Math.abs(dy);
+    }
+
         else {
             gameState = "gameover";
             drawGameOver();
