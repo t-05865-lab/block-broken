@@ -69,15 +69,21 @@ function initBricks() {
 
 // ゲームリセット
 function resetGame(){
-    x = canvas.width/2;
-    y = canvas.height-30;
-    dx = 2 + (level-1)*0.5; // レベルで速度アップ
-    dy = -2 - (level-1)*0.5;
+    balls = [];
+
+    balls.push({
+        x: canvas.width/2,
+        y: canvas.height-30,
+        dx: 2 + (level-1)*0.5,
+        dy: -2 - (level-1)*0.5
+    });
+
     paddleX = (canvas.width - paddleWidth)/2;
     score = 0;
     brickRowCount = 3 + level - 1;
     initBricks();
 }
+
 
 // 衝突判定
 function collisionDetection(){
