@@ -151,7 +151,7 @@ function drawPaddle(){
 function drawScore(){
     ctx.font = "16px Arial";
     ctx.fillStyle = "#fff";
-    ctx.fillText("スコア: "+score, canvas.width80, 20);
+    ctx.fillText("スコア: "+score, 10, 20);
     ctx.fillText("レベル: "+level, canvas.width-80, 20);
 }
 
