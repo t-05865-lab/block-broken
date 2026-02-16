@@ -54,7 +54,7 @@ function initBricks() {
     for(let c=0; c<brickColumnCount; c++){
         bricks[c] = [];
         for(let r=0; r<brickRowCount; r++){
-            bricks[c][r] = { x:0, y:0, status:1 };
+            bricks[c][r] = { x:0, y:0, status:1 ,color: `hsl(${Math.random()*360}, 70%, 50%)`};
         }
     }
 }
@@ -88,6 +88,7 @@ function collisionDetection(){
                             level++;
                             gameState = "playing";
                             resetGame();
+                          　draw();
                         }, 2000);
                     }
                 }
@@ -107,7 +108,7 @@ function drawBricks(){
                 bricks[c][r].y = brickY;
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = `hsl(${Math.random()*360}, 70%, 50%)`;
+                ctx.fillStyle = bricks[c][r].color;
                 ctx.fill();
                 ctx.closePath();
             }
