@@ -88,7 +88,7 @@ function collisionDetection(){
                             level++;
                             gameState = "playing";
                             resetGame();
-                          　draw();
+                            draw();
                         }, 2000);
                     }
                 }
