@@ -215,8 +215,8 @@ else if(y + dy > canvas.height - ballRadius){
 }
 
     // パドル操作
-    if(rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 5;
-    if(leftPressed && paddleX > 0) paddleX -= 5;
+    if(rightPressed && paddleX < canvas.width - paddleWidth) {paddleX += 5;}
+    if(leftPressed && paddleX > 0) {paddleX -= 5;}
 
     x += dx;
     y += dy;
@@ -226,3 +226,4 @@ else if(y + dy > canvas.height - ballRadius){
 
 // ゲーム開始
 draw();
+}
