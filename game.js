@@ -215,33 +215,38 @@ function draw(){
     collisionDetection();
 
     // 壁反射
-if(x + dx > canvas.width - ballRadius || x + dx < ballRadius){
-    dx = -dx;
+for(let ball of balls){
+
+    if(ball.x + ball.dx > canvas.width - ballRadius || 
+       ball.x + ball.dx < ballRadius){
+        ball.dx = -ball.dx;
+    }
+
+    if(ball.y + ball.dy < ballRadius){
+        ball.dy = -ball.dy;
+    }
+    else if(ball.y + ball.dy > canvas.height - paddleHeight - ballRadius){
+
+        if(
+            ball.x + ballRadius > paddleX &&
+            ball.x - ballRadius < paddleX + paddleWidth
+        ){
+            let hitPoint = ball.x - (paddleX + paddleWidth/2);
+            ball.dx = hitPoint * 0.15;
+            ball.dy = -Math.abs(ball.dy);
+        }
+        else{
+            balls.splice(balls.indexOf(ball), 1);
+            continue;
+        }
+    }
+
+    ball.x += ball.dx;
+    ball.y += ball.dy;
 }
 
-if(y + dy < ballRadius){
-    dy = -dy;
-}
-else if(y + dy > canvas.height - ballRadius){
-
-    // パドルに当たっているか
-    if(
-       x + ballRadius > paddleX &&
-       x - ballRadius < paddleX + paddleWidth
-    ){
-        let hitPoint = x - (paddleX + paddleWidth/2);
-        dx = hitPoint * 0.15;
-        dy = -Math.abs(dy);
-    }
-    else{
-        gameState = "gameover";
-        drawGameOver();
-        setTimeout(() => {
-            gameState = "title";
-            draw();
-        }, 2000);
-        return;
-    }
+if(balls.length === 0){
+    gameState = "gameover";
 }
 
     // パドル操作
