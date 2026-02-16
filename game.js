@@ -90,7 +90,7 @@ function collisionDetection() {
       if (!bricks[c]) continue;
       for (let r = 0; r < brickRowCount; r++) {
         let b = bricks[c][r];
-        if (!b) continue;
+        if (!b) continue;  // <- undefined 対策
 
         if (b.status === 1) {
           if (
@@ -107,6 +107,26 @@ function collisionDetection() {
       }
     }
   });
+
+  // 残りブロックチェック
+  let remaining = 0;
+  for (let c = 0; c < brickColumnCount; c++) {
+    if (!bricks[c]) continue;
+    for (let r = 0; r < brickRowCount; r++) {
+      if (!bricks[c][r]) continue;
+      if (bricks[c][r].status === 1) remaining++;
+    }
+  }
+
+  if (remaining === 0 && gameState === "playing") {
+    gameState = "cleared";
+    setTimeout(() => {
+      level++;
+      resetGame();
+      gameState = "playing";
+    }, 1500);
+  }
+}
 
   // 残ブロックチェック
   let remaining = 0;
