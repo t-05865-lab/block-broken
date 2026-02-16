@@ -86,52 +86,50 @@ function resetGame(){
 
 
 // 衝突判定
-function collisionDetection(){
+function collisionDetection() {
+    // ボールごとにブロックとの衝突判定
     balls.forEach(ball => {
-
-        for(let c=0; c<brickColumnCount; c++){
-            for(let r=0; r<brickRowCount; r++){
-
+        for (let c = 0; c < brickColumnCount; c++) {
+            for (let r = 0; r < brickRowCount; r++) {
                 let b = bricks[c][r];
 
-                if(b.status == 1){
-                    if(
+                if (b.status === 1) {
+                    // ボールがブロックの範囲に入ったら
+                    if (
                         ball.x > b.x &&
                         ball.x < b.x + brickWidth &&
                         ball.y > b.y &&
                         ball.y < b.y + brickHeight
-                    ){
-                        ball.dy = -ball.dy;
-                        b.status = 0;
-                        score++;
+                    ) {
+                        ball.dy = -ball.dy;  // 反射
+                        b.status = 0;        // ブロック消滅
+                        score++;             // スコア加算
                     }
                 }
             }
         }
-
     });
-}
-let remaining = 0;
-{
-    gameState = "cleared";
-    setTimeout(()=>{
-        level++;
-        gameState = "playing";
-        resetGame();
-    }, 2000);
-}
 
-for(let c=0; c<brickColumnCount; c++){
-    for(let r=0; r<brickRowCount; r++){
-        if(bricks[c][r].status === 1){
-            remaining++;
+    // --- 残っているブロックを数える ---
+    let remaining = 0;
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            if (bricks[c][r].status === 1) {
+                remaining++;
+            }
         }
     }
-}
 
-if(remaining === 0){
-    level++;
-    gameState = "cleared";
+    // --- 全ブロック消滅でクリア処理 ---
+    if (remaining === 0) {
+        gameState = "cleared";  // クリア画面表示
+
+        setTimeout(() => {
+            level++;            // レベルアップ
+            gameState = "playing"; 
+            resetGame();        // 次のレベル用にリセット
+        }, 1500);               // 1.5秒後に自動で次レベルへ
+    }
 }
 
 
