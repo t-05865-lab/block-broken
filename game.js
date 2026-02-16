@@ -187,8 +187,16 @@ function draw(){
     // 壁反射
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) dx = -dx;
     if(y + dy < ballRadius) dy = -dy;
-   else if(y + dy > canvas.height-ballRadius){
-    if(x > paddleX && x < paddleX + paddleWidth){
+   else if(y + ballRadius + dy > canvas.height - paddleHeight){
+    if(
+        x + ballRadius > paddleX &&
+        x - ballRadius < paddleX + paddleWidth
+    ){
+        let hitPoint = x - (paddleX + paddleWidth/2);
+        dx = hitPoint * 0.15;
+        dy = -Math.abs(dy);
+    }
+
         let hitPoint = x - (paddleX + paddleWidth/2);
         dx = hitPoint * 0.15;
         dy = -Math.abs(dy);
