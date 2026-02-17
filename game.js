@@ -184,6 +184,8 @@ function collisionDetection() {
           ball.dy = -ball.dy;
           b.status = 0;
           score++;
+          playSound("hit");
+          createParticles(ball.x, ball.y, b.color);
         }
       }
     }
